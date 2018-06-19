@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <title>Chrome Regex Search</title>
 
   <script src="js/jquery-3.2.1.min.js"></script>
@@ -58,13 +59,16 @@
       text-align: right;
       display: flex;
     }
-
     #inputRegex {
-      width: 22em;
+      width: 17em;
+      border: none;
       border-radius: 2px;
+      height: 27px;
+      padding-left: 6pt;
+      font-size: 10pt;
       padding-right: 5em;
       -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .125);
-      box-shadow: 0 1px 1px rgba(0, 0, 0, .125);
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.22);
     }
 
     #numResults {
@@ -111,7 +115,7 @@
     }
 
     body {
-      background-color: #dddddd;
+      background-color: #82bfda;
     }
 
     .error-chrome-regex {
@@ -128,8 +132,11 @@
   <input   id="checkBox" type="checkbox" style="float: right; height: 1cm;width: 1cm;">
   <h2 style="text-align: center;font-family: 'Times New Roman', Times, serif;">Travail Pratique 01 ALOG</h2>
 
+  <div>
+    <p ><strong> Rechercher dans la page :</strong></p>
+</div>
   <div class="flexContainer">
-    <input id="inputRegex" type="text" name="inputRegex"></input>
+    <input id="inputRegex" type="text" placeholder="Entrer une expression regulière ici ... " name="inputRegex"></input>
     <span id="numResults"></span>
 
     <a href="#" id="prev" type="button" title="precedent">

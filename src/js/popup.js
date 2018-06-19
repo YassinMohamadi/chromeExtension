@@ -171,9 +171,10 @@ function updateHistoryDiv() {
       span.textContent = HISTORY_IS_EMPTY_TEXT;
       historyDiv.appendChild(span);
     } else {
-      for (var i = searchHistory.length - 1; i >= 0; i--) {
+    //  for (var i = searchHistory.length - 1; i >= 0; i--) {
+        var i = searchHistory.length - 1;
         historyDiv.appendChild(createHistoryLineElement(searchHistory[i]));
-      }
+     // }
       var clearButton = document.createElement('a');
       clearButton.href = '#';
       clearButton.type = 'button';
@@ -263,7 +264,10 @@ document.getElementById('clear').addEventListener('click', function () {
 
 document.getElementById('show-history').addEventListener('click', function () {
   var makeVisible = document.getElementById('history').style.display == 'none';
-  setHistoryVisibility(makeVisible);
+  var i = searchHistory.length - 1;
+  document.getElementById('inputRegex').value= searchHistory[i];
+  passInputToContentScript();
+  //setHistoryVisibility(makeVisible);
   chrome.storage.local.set({ isSearchHistoryVisible: makeVisible });
 });
 
@@ -280,9 +284,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if ('returnSearchInfo' == request.message) {
     processingKey = false;
     if (request.numResults > 0) {
-      document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' of ' + String(request.numResults);
+      document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' / ' + String(request.numResults);
     } else {
-      document.getElementById('numResults').textContent = String(request.currentSelection) + ' of ' + String(request.numResults);
+      document.getElementById('numResults').textContent = String(request.currentSelection) + ' / ' + String(request.numResults);
     }
     if (!sentInput) {
       document.getElementById('inputRegex').value = request.regexString;
