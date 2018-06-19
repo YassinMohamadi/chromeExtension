@@ -1,9 +1,9 @@
 // script pour changer le mode dynamique
-const checkbox = $("#checkBox");
+const checkbox = $("#checkboxThreeInput");
 
 
 
-
+/*
 if (localStorage.getItem("a") == "1") {
   
   $('#checkBox').prop('checked', true);
@@ -15,7 +15,7 @@ else {
   $("#off").css("color", "black");
   $("#on").css("color", "red");
 }
-
+*/
 
 
 checkbox.change(function (event) {
@@ -23,15 +23,16 @@ checkbox.change(function (event) {
   if (checkbox.checked) {
     localStorage.setItem("a", "1");
     //alert(localStorage.getItem("a"));
-    $("#on").css("color", "black");
+   /* $("#on").css("color", "black");
     $("#off").css("color", "red");
-
+*/
   } else {
     localStorage.setItem("a", "0");
     //alert(localStorage.getItem("a"));
-    $("#off").css("color", "black");
+  /*  $("#off").css("color", "black");
     $("#on").css("color", "red");
-  }
+  */
+}
 
 
 });
