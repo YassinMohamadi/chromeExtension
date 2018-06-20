@@ -1,6 +1,22 @@
+// script pour changer le mode dynamique
+const checkbox = $("#checkBox");
+// active par defaut
+localStorage.setItem("a", "1");
 
-// vriable pour savoir si on fait oupa s
-var a = false;
+checkbox.change(function (event) {
+  var checkbox = event.target;
+  if (checkbox.checked) {
+    localStorage.setItem("a", "1");
+    alert(localStorage.getItem("a"));
+  } else {
+    localStorage.setItem("a", "0");
+    alert(localStorage.getItem("a"));
+  }
+
+
+});
+
+
 
 /*** CONSTANTS ***/
 var DEFAULT_INSTANT_RESULTS = true;
@@ -238,32 +254,34 @@ document.getElementById('show-history').addEventListener('click', function () {
 /* Received returnSearchInfo message, populate popup UI */
 
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
-  if ('returnSearchInfo' == request.message) {
-    processingKey = false;
-    if (request.numResults > 0) {
-      document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' of ' + String(request.numResults);
-    } else {
-      document.getElementById('numResults').textContent = String(request.currentSelection) + ' of ' + String(request.numResults);
-    }
-    if (!sentInput) {
-      document.getElementById('inputRegex').value = request.regexString;
-    }
-    if (request.numResults > 0 && request.cause == 'selectNode') {
-      addToHistory(request.regexString);
-    }
-    if (request.regexString !== document.getElementById('inputRegex').value) {
-      passInputToContentScript();
-    }
-  }
+  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
-});
+    if ('returnSearchInfo' == request.message) {
+      processingKey = false;
+      if (request.numResults > 0) {
+        document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' of ' + String(request.numResults);
+      } else {
+        document.getElementById('numResults').textContent = String(request.currentSelection) + ' of ' + String(request.numResults);
+      }
+      if (!sentInput) {
+        document.getElementById('inputRegex').value = request.regexString;
+      }
+      if (request.numResults > 0 && request.cause == 'selectNode') {
+        addToHistory(request.regexString);
+      }
+      if (request.regexString !== document.getElementById('inputRegex').value) {
+        passInputToContentScript();
+      }
+    }
+
+  });
+
 
 /* Key listener for selectNext and selectPrev
  * Thanks a lot to Cristy from StackOverflow for this AWESOME solution
  * http://stackoverflow.com/questions/5203407/javascript-multiple-keys-pressed-at-once */
- 
+
 var map = [];
 onkeydown = onkeyup = function (e) {
   map[e.keyCode] = e.type == 'keydown';
@@ -283,7 +301,7 @@ onkeydown = onkeyup = function (e) {
 
 /*** INIT ***/
 /* Retrieve from storage whether we should use instant results or not */
-if (a == true) {
+
 chrome.storage.local.get({
   'instantResults': DEFAULT_INSTANT_RESULTS,
   'maxHistoryLength': MAX_HISTORY_LENGTH,
@@ -294,12 +312,16 @@ chrome.storage.local.get({
     if (result.instantResults) {
       document.getElementById('inputRegex').addEventListener('input', function () {
         // ici on effectue la recherche
+
         passInputToContentScript();
+
       });
     } else {
       document.getElementById('inputRegex').addEventListener('change', function () {
-        
+
+
         passInputToContentScript();
+
       });
     }
     console.log(result);
@@ -318,25 +340,25 @@ chrome.storage.local.get({
 
 /* Get search info if there is any */
 
-  chrome.tabs.query({
-    'active': true,
-    'currentWindow': true
-  },
-    function (tabs) {
-      if ('undefined' != typeof tabs[0].id && tabs[0].id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          'message': 'getSearchInfo'
-        }, function (response) {
-          if (response) {
-            // Content script is active
-            console.log(response);
-          } else {
-            console.log(response);
-            document.getElementById('error').textContent = ERROR_TEXT;
-          }
-        });
-      }
-    });
+chrome.tabs.query({
+  'active': true,
+  'currentWindow': true
+},
+  function (tabs) {
+    if ('undefined' != typeof tabs[0].id && tabs[0].id) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        'message': 'getSearchInfo'
+      }, function (response) {
+        if (response) {
+          // Content script is active
+          console.log(response);
+        } else {
+          console.log(response);
+          document.getElementById('error').textContent = ERROR_TEXT;
+        }
+      });
+    }
+  });
 
 
 /* Focus onto input form */
@@ -351,5 +373,5 @@ chrome.storage.local.set({ isSearchHistoryVisible: makeVisible });
 
 //setCaseInsensitiveElement();
 /*** INIT ***/
-}
+
 
