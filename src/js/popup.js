@@ -1,21 +1,30 @@
 // script pour changer le mode dynamique
-const checkbox = $("#checkboxThreeInput");
+const checkbox = $("#checkBox");
 
+chrome.extension.getBackgroundPage().console.log(localStorage.getItem("pattern"));
 
+$("#inputRegex").text(localStorage.getItem("pattern"));
 
-/*
 if (localStorage.getItem("a") == "1") {
   
   $('#checkBox').prop('checked', true);
   $("#on").css("color", "black");
   $("#off").css("color", "red");
+  $("#sah").show();
+  
+  
+  chrome.extension.getBackgroundPage().console.log("ici1");
 }
 else {
   $('#checkBox').prop('checked', false);
   $("#off").css("color", "black");
   $("#on").css("color", "red");
+  chrome.extension.getBackgroundPage().console.log("ici2");
+  
+  $("#sah").hide();
+ 
 }
-*/
+
 
 
 checkbox.change(function (event) {
@@ -23,16 +32,17 @@ checkbox.change(function (event) {
   if (checkbox.checked) {
     localStorage.setItem("a", "1");
     //alert(localStorage.getItem("a"));
-   /* $("#on").css("color", "black");
+    $("#on").css("color", "black");
     $("#off").css("color", "red");
-*/
+    $("#sah").show();
+
   } else {
     localStorage.setItem("a", "0");
     //alert(localStorage.getItem("a"));
-  /*  $("#off").css("color", "black");
+    $("#off").css("color", "black");
     $("#on").css("color", "red");
-  */
-}
+     $("#sah").hide();
+  }
 
 
 });
@@ -104,12 +114,17 @@ function selectPrev() {
 
 /* Send message to pass input string to content script of tab to find and highlight regex matches */
 function passInputToContentScript() {
+  if (localStorage.getItem("a") == "1") {
   passInputToContentScript(false);
+  }
 }
 
 function passInputToContentScript(configurationChanged) {
   if (!processingKey) {
+    
     var regexString = document.getElementById('inputRegex').value;
+    // on set la derniere expression reguliere 
+    localStorage.setItem("pattern",regexString);
     if (!isValidRegex(regexString)) {
       document.getElementById('inputRegex').style.backgroundColor = ERROR_COLOR;
     } else {
@@ -151,8 +166,11 @@ function createHistoryLineElement(text) {
   linkSpan.textContent = text;
   linkSpan.addEventListener('click', function () {
     if (document.getElementById('inputRegex').value !== text) {
+      if (localStorage.getItem("a") == "1") {
       document.getElementById('inputRegex').value = text;
+      
       passInputToContentScript();
+      }
       document.getElementById('inputRegex').focus();
     }
   });
@@ -172,10 +190,9 @@ function updateHistoryDiv() {
       span.textContent = HISTORY_IS_EMPTY_TEXT;
       historyDiv.appendChild(span);
     } else {
-    //  for (var i = searchHistory.length - 1; i >= 0; i--) {
-        var i = searchHistory.length - 1;
+      for (var i = searchHistory.length - 1; i >= 0; i--) {
         historyDiv.appendChild(createHistoryLineElement(searchHistory[i]));
-     // }
+      }
       var clearButton = document.createElement('a');
       clearButton.href = '#';
       clearButton.type = 'button';
@@ -259,16 +276,15 @@ document.getElementById('prev').addEventListener('click', function () {
 document.getElementById('clear').addEventListener('click', function () {
   sentInput = false;
   document.getElementById('inputRegex').value = '';
+  if (localStorage.getItem("a") == "1") {
   passInputToContentScript();
+  }
   document.getElementById('inputRegex').focus();
 });
 
 document.getElementById('show-history').addEventListener('click', function () {
   var makeVisible = document.getElementById('history').style.display == 'none';
-  var i = searchHistory.length - 1;
-  document.getElementById('inputRegex').value= searchHistory[i];
-  passInputToContentScript();
-  //setHistoryVisibility(makeVisible);
+  setHistoryVisibility(makeVisible);
   chrome.storage.local.set({ isSearchHistoryVisible: makeVisible });
 });
 
@@ -285,18 +301,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if ('returnSearchInfo' == request.message) {
     processingKey = false;
     if (request.numResults > 0) {
-      document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' / ' + String(request.numResults);
+      document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' of ' + String(request.numResults);
     } else {
-      document.getElementById('numResults').textContent = String(request.currentSelection) + ' / ' + String(request.numResults);
+      document.getElementById('numResults').textContent = String(request.currentSelection) + ' of ' + String(request.numResults);
     }
     if (!sentInput) {
-      document.getElementById('inputRegex').value = request.regexString;
+      document.getElementById('inputRegex').value = localStorage.getItem("pattern");//request.regexString;
     }
     if (request.numResults > 0 && request.cause == 'selectNode') {
       addToHistory(request.regexString);
     }
     if (request.regexString !== document.getElementById('inputRegex').value) {
+      if (localStorage.getItem("a") == "1") {
       passInputToContentScript();
+      }
     }
   }
 
@@ -315,8 +333,9 @@ onkeydown = onkeyup = function (e) {
       if (sentInput) {
         selectNext();
       } else {
+        if (localStorage.getItem("a") == "1") {
         passInputToContentScript();
-      }
+      }}
     } else if (map[16] && map[13]) { //SHIFT + ENTER
       selectPrev();
     }
@@ -349,8 +368,9 @@ chrome.storage.local.get({
       });
     } else {
       document.getElementById('inputRegex').addEventListener('change', function () {
+        if (localStorage.getItem("a") == "1") {
         passInputToContentScript();
-
+        }
       });
     }
     console.log(result);
