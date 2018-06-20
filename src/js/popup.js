@@ -1,16 +1,36 @@
 // script pour changer le mode dynamique
 const checkbox = $("#checkBox");
-// active par defaut
-localStorage.setItem("a", "1");
+
+
+
+
+if (localStorage.getItem("a") == "1") {
+  
+  $('#checkBox').prop('checked', true);
+  $("#on").css("color", "black");
+  $("#off").css("color", "red");
+}
+else {
+  $('#checkBox').prop('checked', false);
+  $("#off").css("color", "black");
+  $("#on").css("color", "red");
+}
+
+
 
 checkbox.change(function (event) {
   var checkbox = event.target;
   if (checkbox.checked) {
     localStorage.setItem("a", "1");
-    alert(localStorage.getItem("a"));
+    //alert(localStorage.getItem("a"));
+    $("#on").css("color", "black");
+    $("#off").css("color", "red");
+
   } else {
     localStorage.setItem("a", "0");
-    alert(localStorage.getItem("a"));
+    //alert(localStorage.getItem("a"));
+    $("#off").css("color", "black");
+    $("#on").css("color", "red");
   }
 
 
@@ -255,27 +275,27 @@ document.getElementById('show-history').addEventListener('click', function () {
 
 
 
-  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
-    if ('returnSearchInfo' == request.message) {
-      processingKey = false;
-      if (request.numResults > 0) {
-        document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' of ' + String(request.numResults);
-      } else {
-        document.getElementById('numResults').textContent = String(request.currentSelection) + ' of ' + String(request.numResults);
-      }
-      if (!sentInput) {
-        document.getElementById('inputRegex').value = request.regexString;
-      }
-      if (request.numResults > 0 && request.cause == 'selectNode') {
-        addToHistory(request.regexString);
-      }
-      if (request.regexString !== document.getElementById('inputRegex').value) {
-        passInputToContentScript();
-      }
+  if ('returnSearchInfo' == request.message) {
+    processingKey = false;
+    if (request.numResults > 0) {
+      document.getElementById('numResults').textContent = String(request.currentSelection + 1) + ' of ' + String(request.numResults);
+    } else {
+      document.getElementById('numResults').textContent = String(request.currentSelection) + ' of ' + String(request.numResults);
     }
+    if (!sentInput) {
+      document.getElementById('inputRegex').value = request.regexString;
+    }
+    if (request.numResults > 0 && request.cause == 'selectNode') {
+      addToHistory(request.regexString);
+    }
+    if (request.regexString !== document.getElementById('inputRegex').value) {
+      passInputToContentScript();
+    }
+  }
 
-  });
+});
 
 
 /* Key listener for selectNext and selectPrev
@@ -303,23 +323,27 @@ onkeydown = onkeyup = function (e) {
 /* Retrieve from storage whether we should use instant results or not */
 
 chrome.storage.local.get({
+
   'instantResults': DEFAULT_INSTANT_RESULTS,
   'maxHistoryLength': MAX_HISTORY_LENGTH,
   'searchHistory': null,
   'isSearchHistoryVisible': false
 },
   function (result) {
+
+
     if (result.instantResults) {
       document.getElementById('inputRegex').addEventListener('input', function () {
         // ici on effectue la recherche
+        if (localStorage.getItem("a") == "1") {
+          
+          passInputToContentScript();
+        }
 
-        passInputToContentScript();
 
       });
     } else {
       document.getElementById('inputRegex').addEventListener('change', function () {
-
-
         passInputToContentScript();
 
       });
